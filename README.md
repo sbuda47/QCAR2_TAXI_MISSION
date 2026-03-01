@@ -1,25 +1,31 @@
 **QCar2 Taxi Mission 2026 **
+
 This repository contains a ROS 2 (Humble) control stack for the Quanser Virtual QCar2 taxi scenario (2026). The system is designed with a control-engineering mindset: clear separation of perception, planning, and control, deterministic authority over actuators, and repeatable start/stop procedures.
+
 The single most important design rule in this project is:
 -Only ONE node is allowed to publish /qcar2_motor_speed_cmd (MotorCommands).
 -Any additional publisher (e.g., Nav2 converters) will cause actuator contention, erratic behavior, and unsafe trajectories.
 
 **System Overview**
+
 Control Objectives
 -Follow the right-hand lane, keeping the yellow centerline on the left.
 -Respect traffic control elements:
 -Stop signs (COCO “stop sign” class)
 -Traffic lights with state classification (red/yellow/green/off)
+
 Execute taxi routing:
 -Pickup at [0.125, 4.395]
 -Dropoff at [-0.905, 0.800]
 -Return to hub near [0.0, 0.0]
+
 Provide an extensible framework for:
 -Mission state logic (pickup/dropoff stop durations)
 -LED signaling (magenta/green/blue/orange states)
 -Road-rule expansions (yield handling, priority logic)
 
 **High-Level Architecture**
+
 Runtime nodes (launched together in Terminal 3)
 When you run our project launch file, it starts all of the project nodes:
 -Traffic Detector (traffic_detector)
@@ -34,13 +40,15 @@ Executes:
 -Steering controller (lane-first + goal bias)
 -Speed controller (traffic-rule + curvature + confidence + approach slowdown)
 Publishes:
-  /qcar2_motor_speed_cmd (MotorCommands) ✅ ONLY publisher allowed
+  /qcar2_motor_speed_cmd (MotorCommands) ONLY publisher allowed
+  
 Why this structure works (control rationale)
 No actuator contention: a single actuator node eliminates conflicts.
 Separable tuning: lane/steer/speed parameters are configured centrally via YAML.
 Fail-safe behavior: if inputs are missing (no TF, no image), the controller commands a stop.
 
 **Required External Components (Platform Setup)**
+
 This project runs across two environments:
 -Quanser Virtual QCar2 Docker container (spawns QLabs map + assets)
 -Isaac ROS dev container (runs ROS 2 stack and our nodes)
@@ -50,8 +58,10 @@ This README focuses on the project stack. For full environment setup, follow Qua
   Virtual ROS Development Guide:
   https://github.com/quanser/student-competition-resources-ros/blob/main/Virtual_ROS_Resources/Virtual_ROS_Development_Guide.md
 
-**How to run **
+**How to run**
+
 **Terminal 1 — Quanser container (spawn map WITH signs)**
+
 On the Ubuntu host:
   sudo docker rm -f virtual-qcar2 2>/dev/null || true
   sudo docker run --rm -it --network host --name virtual-qcar2 quanser/virtual-qcar2 bash
@@ -60,6 +70,7 @@ Inside the container:
 Verification: In QLabs you should see the track and road assets (stop signs, yield, traffic lights).
 
 **Terminal 2 — Isaac ROS bringup (camera/scan/tf/map)**
+
 Inside the container:
   export ROS_DOMAIN_ID=0
   source /opt/ros/humble/setup.bash
@@ -81,6 +92,7 @@ Expected:
   /qcar2_led_cmd
 
 **Terminal 3 — Project Stack Launch (runs all project nodes)**
+
 This is the only terminal you use to run the project nodes.
 Inside the Isaac ROS container (new terminal attached to container or in the same one after bringup is running):
    source /workspaces/isaac_ros-dev/install/setup.bash
@@ -93,6 +105,7 @@ This launch starts:
   main_controller_1
 
 **Critical Safety / Control Integrity Check (Actuator Authority)**
+
 Before driving, confirm that only the main controller is commanding MotorCommands:
   ros2 topic info /qcar2_motor_speed_cmd -v
   
@@ -109,6 +122,7 @@ Then re-check:
 Note: if the converter respawns, it is being launched by the bringup. In that case, the bringup configuration must be adjusted. The --show-args list for the bringup launch does not expose a “disable converter” argument, so the practical approach is process termination or a parameter override file applied to bringup (advanced).
 
 **What the YAML Controls **
+
 All tunable parameters for perception + steering + speed are centralized in:
 config/main_controller.yaml
 We use namespaced parameters, for example:
@@ -119,6 +133,7 @@ We use namespaced parameters, for example:
 This keeps tuning systematic and repeatable.
 
 **Operational Telemetry **
+
 Traffic state output
   ros2 topic echo /traffic_state
 Taxi mission state and target
@@ -130,6 +145,7 @@ Pose validity (TF)
   ros2 run tf2_ros tf2_echo map base_link
 
 **Repository Structure**
+
 qcar2_taxi_2026/
  qcar2_taxi_2026/
    controllers/
