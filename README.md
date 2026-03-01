@@ -85,11 +85,8 @@ Verification: In QLabs you should see the track and road assets (stop signs, yie
 
 Inside the container:
   ````bash
-  export ROS_DOMAIN_ID=0
-  source /opt/ros/humble/setup.bash
-  cd /workspaces/isaac_ros-dev
   colcon build --symlink-install
-  source /workspaces/isaac_ros-dev/install/setup.bash
+  source install/setup.bash
   ````
 Launch the QCar2 virtual SLAM + Nav bringup:
   ````bash
@@ -102,26 +99,27 @@ Verification (core topics must exist):
   ````
   
 Expected:
-  /camera/color_image, /scan
-  /tf, /tf_static
-  /map
-  /qcar2_motor_speed_cmd
-  /qcar2_led_cmd
+  `/camera/color_image,`
+  `/scan`
+  `/tf, /tf_static`
+  `/map`
+  `/qcar2_motor_speed_cmd`
+  `/qcar2_led_cmd`
 
 #### Terminal 3 — Project Stack Launch (runs all project nodes)
 
 This is the only terminal you use to run the project nodes.
 Inside the Isaac ROS container (new terminal attached to container or in the same one after bringup is running):
   ````bash
-   source /workspaces/isaac_ros-dev/install/setup.bash
-   ros2 launch qcar2_taxi_2026 qcar2_taxi_stack.launch.py \
+   source install/setup.bash
+   ros2 launch qcar2_taxi_2026 qcar2_taxi_stack.launch.py 
    params_file:= qcar2_taxi_2026/config/main_controller.yaml
   ````
    
 This launch starts:
-  traffic_detector_1
-  taxi_planner_1
-  main_controller_1
+  `traffic_detector_1`
+  `taxi_planner_1`
+  `main_controller_1`
 
 ### Critical Safety / Control Integrity Check (Actuator Authority)
 
@@ -131,8 +129,8 @@ Before driving, confirm that only the main controller is commanding MotorCommand
   ````
   
 Desired state:
-  Publisher count: 1
-  Publisher node: main_controller_1
+  `Publisher count: 1`
+  `Publisher node: main_controller_1`
   
 If you see nav2_qcar2_converter publishing
 This is actuator contention. The converter exists to translate Nav2 /cmd_vel into QCar2 MotorCommands. Since our controller publishes MotorCommands directly, the converter must not publish.
@@ -151,10 +149,10 @@ Note: if the converter respawns, it is being launched by the bringup. In that ca
 All tunable parameters for perception + steering + speed are centralized in:
 config/main_controller.yaml
 We use namespaced parameters, for example:
-  lane.* → perception geometry & thresholds
-  steer.* → steering gains, smoothing, limits
-  speed.* → throttle policy, approach slowdown, safety limits
-  topics.*, frames.* → integration wiring
+  `lane.* → perception geometry & thresholds`
+  `steer.* → steering gains, smoothing, limits`
+  `speed.* → throttle policy, approach slowdown, safety limits`
+  `topics.*, frames.* → integration wiring`
 This keeps tuning systematic and repeatable.
 
 ### Operational Telemetry 
