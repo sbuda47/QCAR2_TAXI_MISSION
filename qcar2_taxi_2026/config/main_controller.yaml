@@ -1,0 +1,71 @@
+main_controller:
+  ros__parameters:
+    topics.image: /camera/color_image
+    topics.taxi_target: /taxi_target
+    topics.traffic_state: /traffic_state
+    topics.cmd: /qcar2_motor_speed_cmd
+
+    frames.map: map
+    frames.base: base_link
+
+    cmd_rate_hz: 25.0
+
+    # ---------------- Lane perception ----------------
+    lane.road_roi_y0: 330
+    lane.road_roi_y1: 480
+    lane.road_v_max: 85
+    lane.road_min_ratio: 0.03
+    lane.road_steer_gain: 1.4
+
+    lane.yellow_roi_y0: 180
+    lane.yellow_roi_y1: 480
+    lane.yellow_target_x_ratio: 0.30
+    lane.yellow_steer_gain: 2.0
+
+    lane.yellow_min_ratio: 0.001
+    lane.yellow_col_frac: 0.35
+    lane.yellow_memory_sec: 0.7
+
+    lane.yellow_h_low: 15
+    lane.yellow_h_high: 45
+    lane.yellow_s_low: 60
+    lane.yellow_v_low: 60
+
+    lane.w_road: 1.30
+    lane.w_yellow: 0.85
+
+    lane.yellow_guard_enable: true
+    lane.yellow_guard_max_x_ratio: 0.40
+    lane.yellow_guard_push: 0.08
+    lane.yellow_guard_k: 1.4
+
+    # ---------------- Steering controller ----------------
+    steer.max_steer_rad: 0.40
+    steer.steer_smooth_alpha: 0.55
+    steer.steer_rate_limit: 0.06
+
+    steer.k_goal: 0.55
+    steer.goal_bias_max: 0.18
+
+    steer.lane_conf_min: 0.08
+    steer.lane_conf_soften: 0.60
+
+    # ---------------- Speed controller ----------------
+    speed.base_throttle: 0.55
+    speed.min_throttle: 0.38
+    speed.max_throttle: 0.80
+
+    speed.yield_factor: 0.55
+
+    speed.turn_slow_k: 0.55
+    speed.turn_slow_min: 0.55
+
+    speed.lane_slow_k: 0.60
+    speed.lane_slow_min: 0.50
+
+    speed.slow_radius_m: 1.20
+    speed.stop_radius_m: 0.35
+    speed.approach_min_throttle: 0.10
+
+    debug: false
+    debug_print_hz: 2.0
